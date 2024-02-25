@@ -48,4 +48,5 @@ To show that Streamlit in Snowflake execute the app with the owner context/role,
 ## References
 * https://www.snowflake.com/en/data-cloud/overview/streamlit-in-snowflake/
 * https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit/
+* https://docs.snowflake.com/en/developer-guide/streamlit/owners-rights
 * https://docs.streamlit.io/
