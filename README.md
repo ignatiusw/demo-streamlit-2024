@@ -7,17 +7,18 @@ This repo holds all the codes and sample data for Streamlit in Snowflake demo (2
 3. If you don't have ACCOUNTADMIN privileges, you have at least one of the privileges mentioned [here](https://docs.snowflake.com/en/user-guide/ui-snowsight-activity#privileges-required-to-view-query-history) in order to view query history
 
 ## Demo Steps
-1. Run [01_user-and-database-setup.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/01_user-and-database-setup.sql) to set up all the users, roles, database objects, warehouse, and privileges required to run this demo
-2. Log in as `DEMO_STREAMLIT_CREATOR` user
-3. Execute line 2 to line 6 from [02_prepare-demo-data.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/02_prepare-demo-data.sql#L2-L6), this will switch the role to `ROL_DEMO_DATA_CRUD` and use the `DEMO_PROGRAMMABLE_2024_STREAMLIT_WH` warehouse
-4. Load the [demo_data.csv](https://raw.githubusercontent.com/ignatiusw/demo-streamlit-2024/main/data/demo_data.csv) into a new table called `DEMO_DATA` under `DATA` schema in `DEMO_PROGRAMMABLE_2024_STREAMLIT_DB` database
-5. Execute the rest of the script from line 11 onwards in [02_prepare-demo-data.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/02_prepare-demo-data.sql#L11)
-6. Switch role to `ROL_DEMO_STREAMLIT_CREATOR`
-7. Create a new streamlit app, using the code in [03_streamlit-app.py](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/03_streamlit-app.py)
-8. Feel free to change the filter, and add/update/delete the target revenue data
-9. Share the app to `ROL_DEMO_STREAMLIT_VIEWER` and copy the app URL
-10. Open the app URL in a separate incognito/in-private browser window and login as `DEMO_STREAMLIT_VIEWER` user
-11. Feel free to change the filter, and add/update/delete the target revenue data as the viewer
+1. Login to Snowflake with user that has SYSADMIN privileges
+2. Run [01_user-and-database-setup.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/01_user-and-database-setup.sql) to set up all the users, roles, database objects, warehouse, and privileges required to run this demo
+3. Log in as `DEMO_STREAMLIT_CREATOR` user
+4. Execute line 2 to line 6 from [02_prepare-demo-data.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/02_prepare-demo-data.sql#L2-L6), this will switch the role to `ROL_DEMO_DATA_CRUD` and use the `DEMO_PROGRAMMABLE_2024_STREAMLIT_WH` warehouse
+5. Load the [demo_data.csv](https://raw.githubusercontent.com/ignatiusw/demo-streamlit-2024/main/data/demo_data.csv) into a new table called `DEMO_DATA` under `DATA` schema in `DEMO_PROGRAMMABLE_2024_STREAMLIT_DB` database
+6. Execute the rest of the script from line 11 onwards in [02_prepare-demo-data.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/02_prepare-demo-data.sql#L11)
+7. Switch role to `ROL_DEMO_STREAMLIT_CREATOR`
+8. Create a new streamlit app, using the code in [03_streamlit-app.py](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/03_streamlit-app.py)
+9. Feel free to change the filter, and add/update/delete the target revenue data
+10. Share the app to `ROL_DEMO_STREAMLIT_VIEWER` and copy the app URL
+11. Open the app URL in a separate incognito/in-private browser window and login as `DEMO_STREAMLIT_VIEWER` user
+12. Feel free to change the filter, and add/update/delete the target revenue data as the viewer
 
 ## Optional Exercises
 
