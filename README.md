@@ -43,3 +43,8 @@ To show that Streamlit in Snowflake execute the app with the owner context/role,
 ## Acknowledgement
 1. Demo data is sourced from [kaggle](https://www.kaggle.com/datasets/ankitab18/coles-supermarket-sales?resource=download)
 2. Some of the app components ideas are taken from other users involved in the evaluation of Streamlit in Snowflake (SiS)
+
+## References
+* https://www.snowflake.com/en/data-cloud/overview/streamlit-in-snowflake/
+* https://docs.snowflake.com/en/developer-guide/streamlit/about-streamlit/
+* https://docs.streamlit.io/
