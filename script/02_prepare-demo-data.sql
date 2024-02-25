@@ -2,7 +2,7 @@
 USE ROLE ROL_DEMO_DATA_CRUD;
 USE WAREHOUSE DEMO_PROGRAMMABLE_2024_STREAMLIT_WH;
 
--- Drop the demo data table first in case it already exists
+-- Drop the demo data table first in case it already exists or if you want to reload the data
 DROP TABLE IF EXISTS DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.DEMO_DATA;
 
 -- Load the demo data to DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA as table DEMO_DATA
