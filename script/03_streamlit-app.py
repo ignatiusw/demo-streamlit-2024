@@ -46,6 +46,39 @@ with st.sidebar:
     st.write(f"Current user: {st.experimental_user['login_name']}")
     st.write(f"Streamlit version: {st.__version__}")
 
+# Let's start with visualising all the region's revenue using a bar chart
+df_region_revenue = session.sql(
+    """
+    SELECT *
+    FROM DATA.REVENUE
+        PIVOT (
+            SUM(REVENUE)
+            FOR REGION IN ('AU/NZ', 'US', 'UK')
+        ) AS REVENUE
+    ORDER BY MONTH
+    """
+)
+st.header("Revenue per Month by Region")
+st.write("This bar chart shows the monthly revenue from each region.")
+st.bar_chart(
+    df_region_revenue,
+    x="MONTH"
+)
+
+# Next, let's visualise the store location using map
+df_store_revenue = session.sql(
+    f"""
+    SELECT STORE_ID
+        , LAT
+        , LONG AS LON
+    FROM DATA.STORE_PCT s
+    WHERE REGION = '{filter_region}'
+    """
+)
+st.header(f"Store Locations in {filter_region}")
+st.write("This map shows the locations of each store.")
+st.map(df_store_revenue)
+
 # Get actual revenue data
 df_actual = session.sql(
     f"""
@@ -120,6 +153,12 @@ pdf_revenue = pd.concat(
 
 # Show the data as chart and table
 st.header(f"Actual, Target and Forecasted Revenue per Month for {filter_region} Region")
+st.write(
+    f"""
+    This line chart shows the actual vs target revenue for
+    {filter_region}. It also shows what is the forecasted
+    revenue for the next {filter_months} month(s).
+    """)
 st.line_chart(
     pdf_revenue, 
     x="MONTH", 
