@@ -1,3 +1,4 @@
+### NOTE THIS IS CURRENTLY RUNNING ON STREAMLIT V1.22.0 - IT MAY NOT RUN ONCE STREAMLIT IN SNOWFLAKE VERSION IS UPDATED ###
 # Import python packages
 import streamlit as st
 from snowflake.snowpark.context import get_active_session
