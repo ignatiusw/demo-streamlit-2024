@@ -1,5 +1,6 @@
 # demo-streamlit-2024
 This repo holds all the codes and sample data for Streamlit in Snowflake demo (2024). A copy of the presentation slides will be added once approved for external distribution.
+> ⚠️ **This code is developed when Streamlit in Snowflake (SiS) version is 1.22.0. If and once Snowflake upgrade the Streamlit version, the code may not work 100%**
 
 ## Pre-requisites
 1. You need a Snowflake account. If you don't have one yet, you can sign up for a 30-day free trial [here](https://signup.snowflake.com/)
