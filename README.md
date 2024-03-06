@@ -27,6 +27,7 @@ This repo holds all the codes and sample data for Streamlit in Snowflake demo (2
 
 ### Create Masking Policy to show limitations of Streamlit in Snowflake (SIS) with Secondary Roles
 > ℹ️ **Masking Policy requires Enterprise Edition of Snowflake**.
+
 To demonstrate that secondary roles are not available through SiS, do the following exercise:
 1. Login as user with `USERADMIN`, `SYSADMIN` and `SECURITYADMIN` roles
 2. Execute line 6 to 23 from [04_create-masking-policy.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/04_create-masking-policy.sql#L6-L23)
@@ -60,6 +61,7 @@ To demonstrate that Streamlit in Snowflake execute the app with the owner contex
 
 ### Streamlit in Snowflake (SiS) bypass masking policy
 > ℹ️ **This exercise requires step 04_create-masking-policy.sql as the pre-requisite**.
+
 To demonstrate that masking policy is also bypassed (for the same reason as above, since SiS runs with the owner context/role), do the following exercise:
 1. Using a role with `SECURITYADMIN` privileges, execute line 5 to 13 in [07_sis-bypass-masking-policy.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/07_sis-bypass-masking-policy.sql#L5-L13)
 2. Now login as `DEMO_STREAMLIT_VIEWER` and execute line 16 to 21 in [07_sis-bypass-masking-policy.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/07_sis-bypass-masking-policy.sql#L16-L21), the `REVENUE` column is masked (NULL)
