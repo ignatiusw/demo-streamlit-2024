@@ -39,3 +39,5 @@ SELECT * FROM DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.REVENUE;
 -- Go back to SECURITYADMIN and grant role sensitive to streamlit creator since Secondary Roles are not available in SiS
 USE ROLE SECURITYADMIN;
 GRANT ROLE ROL_DEMO_RO_SENSITIVE TO ROLE ROL_DEMO_STREAMLIT_CREATOR;
+
+-- Now view it again from Streamlit, it is now visible as the sensitive role is now granted to streamlit creator role
