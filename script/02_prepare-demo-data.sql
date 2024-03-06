@@ -2,7 +2,7 @@
 USE ROLE ROL_DEMO_DATA_CRUD;
 USE WAREHOUSE DEMO_PROGRAMMABLE_2024_STREAMLIT_WH;
 
--- Drop the demo data table first in case it already exists or if you want to reload the data
+-- Drop the demo data table first in case it already exists or to reload
 DROP TABLE IF EXISTS DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.DEMO_DATA;
 
 -- Load the demo data to DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA as table DEMO_DATA
@@ -10,11 +10,12 @@ DROP TABLE IF EXISTS DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.DEMO_DATA;
 -- check result
 SELECT * FROM DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.DEMO_DATA;
 
--- Drop the store table first in case it already exists
+-- Drop the store table first in case it already exists or to reload
 DROP TABLE IF EXISTS DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.STORE_PCT;
 
 -- Load the demo data to DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA as table DEMO_DATA
 -- from https://raw.githubusercontent.com/ignatiusw/demo-streamlit-2024/main/data/store_pct.csv
+-- change lat, long, and pct column to FLOAT if it comes up as NUMBER
 -- check result
 SELECT * FROM DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.STORE_PCT;
 
@@ -40,7 +41,7 @@ WHERE GROSS_SALE IS NOT NULL AND SALES_COST IS NOT NULL;
 -- check view
 SELECT * FROM DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.REVENUE;
 
--- Create Snowflake ML Model based on Cortex
+-- Create a forecast model using Snowflake Cortex
 CREATE OR REPLACE SNOWFLAKE.ML.FORECAST DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.FORECAST_MODEL(
     INPUT_DATA => SYSTEM$REFERENCE('VIEW', 'DEMO_PROGRAMMABLE_2024_STREAMLIT_DB.DATA.REVENUE'),
     SERIES_COLNAME => 'REGION',
@@ -66,5 +67,4 @@ SELECT s.MONTH, s.REGION, t.TARGET_REVENUE, s.ACTUAL_REVENUE, s.FORECAST, s.LOWE
 FROM CTE_SALES s
 LEFT JOIN CTE_TARGET t
     ON s.MONTH = t.MONTH
-        AND s.REGION = t.REGION
-ORDER BY REGION, MONTH;
+        AND s.REGION = t.REGION;
