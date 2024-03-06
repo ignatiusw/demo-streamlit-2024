@@ -32,7 +32,7 @@ with st.sidebar:
         FROM DATA.DEMO_DATA
         ORDER BY REGION
         """
-    )
+    ).collect()
     filter_region = st.selectbox(
         "Choose Region:",
         distinct_region,
@@ -58,7 +58,7 @@ df_region_revenue = session.sql(
         ) AS REVENUE
     ORDER BY MONTH
     """
-)
+).collect()
 st.header("Revenue per Month by Region")
 st.write("This bar chart shows the monthly revenue from each region.")
 st.bar_chart(
@@ -67,7 +67,7 @@ st.bar_chart(
 )
 
 # Next, let's visualise the store location using map
-df_store_revenue = session.sql(
+df_store_loc = session.sql(
     f"""
     SELECT STORE_ID
         , LAT
@@ -75,82 +75,89 @@ df_store_revenue = session.sql(
     FROM DATA.STORE_PCT s
     WHERE REGION = '{filter_region}'
     """
-)
+).collect()
 st.header(f"Store Locations in {filter_region}")
 st.write("This map shows the locations of each store.")
-st.map(df_store_revenue)
+st.map(df_store_loc)
 
-# Get actual revenue data
-df_actual = session.sql(
-    f"""
-    SELECT a.MONTH
-        , a.REVENUE AS ACTUAL
-        , t.TARGET_REVENUE AS TARGET
-    FROM DATA.REVENUE a
-    LEFT JOIN DATA.DEMO_DATA t
-        ON a.MONTH = t.MONTH
-            AND a.REGION = t.REGION
-    WHERE a.REGION = '{filter_region}'
-    ORDER BY a.MONTH
+def get_revenue_data():
     """
-)
-# Get forecast revenue data
-df_forecast = session.sql(
-    f"""
-    CALL DATA.FORECAST_MODEL!FORECAST(
-        FORECASTING_PERIODS => {filter_months}
+    This function will get all the required revenue data
+    and combine them into a single dataframe
+    """
+    # Get actual revenue data
+    df_actual = session.sql(
+        f"""
+        SELECT a.MONTH
+            , a.REVENUE AS ACTUAL
+            , t.TARGET_REVENUE AS TARGET
+        FROM DATA.REVENUE a
+        LEFT JOIN DATA.DEMO_DATA t
+            ON a.MONTH = t.MONTH
+                AND a.REGION = t.REGION
+        WHERE a.REGION = '{filter_region}'
+        ORDER BY a.MONTH
+        """
+    ).to_pandas()
+    # Get forecast revenue data
+    df_forecast = session.sql(
+        f"""
+        CALL DATA.FORECAST_MODEL!FORECAST(
+            FORECASTING_PERIODS => {filter_months}
+        )
+        """
+    ).collect()
+
+    # Prepare target data
+    session.sql(
+        f"""
+        CREATE TABLE IF NOT EXISTS STREAMLIT_APP."TARGET_REVENUE_{filter_region}"
+        AS
+        SELECT CAST(MONTH AS VARCHAR(10)) AS MONTH, TARGET_REVENUE
+        FROM DATA.TARGET_REVENUE
+        WHERE REGION = '{filter_region}'
+            AND TARGET_REVENUE IS NOT NULL
+        """
+    ).collect()
+
+    # Get target revenue data
+    df_target = session.sql(
+        f"""
+        SELECT CAST(COALESCE(CAST(fr.MONTH AS DATE), tr.MONTH) AS TIMESTAMP_NTZ) AS MONTH
+            , COALESCE(fr.TARGET_REVENUE, tr.TARGET_REVENUE) AS TARGET
+        FROM DATA.TARGET_REVENUE tr
+        FULL OUTER JOIN STREAMLIT_APP."TARGET_REVENUE_{filter_region}" fr
+            ON tr.MONTH = CAST(fr.MONTH AS DATE)
+        WHERE COALESCE(tr.REGION, '{filter_region}') = '{filter_region}'
+        ORDER BY MONTH
+        LIMIT {filter_months}
+        """
+    ).to_pandas()
+
+    # Convert forecast to pandas dataframe and remove other series
+    pdf_forecast = pd.DataFrame(df_forecast).rename(columns={"TS": "MONTH"})
+    pdf_forecast.drop(
+        pdf_forecast[pdf_forecast["SERIES"] != f'"{filter_region}"'].index,
+        inplace=True
     )
-    """
-).collect()
 
-# Prepare target data
-session.sql(
-    f"""
-    CREATE TABLE IF NOT EXISTS STREAMLIT_APP."TARGET_REVENUE_{filter_region}"
-    AS
-    SELECT CAST(MONTH AS VARCHAR(10)) AS MONTH, TARGET_REVENUE
-    FROM DATA.TARGET_REVENUE
-    WHERE REGION = '{filter_region}'
-        AND TARGET_REVENUE IS NOT NULL
-    """
-).collect()
+    # Combine the data
+    pdf_forecast_target = pd.merge(
+        pdf_forecast.drop("SERIES", axis=1),
+        df_target,
+        on="MONTH",
+        how="outer"
+    )
 
-# Get target revenue data
-df_target = session.sql(
-    f"""
-    SELECT CAST(COALESCE(CAST(fr.MONTH AS DATE), tr.MONTH) AS TIMESTAMP_NTZ) AS MONTH
-        , COALESCE(fr.TARGET_REVENUE, tr.TARGET_REVENUE) AS TARGET
-    FROM DATA.TARGET_REVENUE tr
-    FULL OUTER JOIN STREAMLIT_APP."TARGET_REVENUE_{filter_region}" fr
-        ON tr.MONTH = CAST(fr.MONTH AS DATE)
-    WHERE COALESCE(tr.REGION, '{filter_region}') = '{filter_region}'
-    ORDER BY MONTH
-    LIMIT {filter_months}
-    """
-)
+    pdf_revenue = pd.concat(
+        [
+            df_actual,
+            pdf_forecast_target
+        ],
+        ignore_index=True
+    )
 
-# Convert forecast to pandas dataframe and remove other series
-pdf_forecast = pd.DataFrame(df_forecast).rename(columns={"TS": "MONTH"})
-pdf_forecast.drop(
-    pdf_forecast[pdf_forecast["SERIES"] != f'"{filter_region}"'].index,
-    inplace=True
-)
-
-# Combine the data
-pdf_forecast_target = pd.merge(
-    pdf_forecast.drop("SERIES", axis=1),
-    df_target.to_pandas(),
-    on="MONTH",
-    how="outer"
-)
-
-pdf_revenue = pd.concat(
-    [
-        df_actual.to_pandas(),
-        pdf_forecast_target
-    ],
-    ignore_index=True
-)
+    return pdf_revenue
 
 # Show the data as chart and table
 st.header(f"Actual, Target and Forecasted Revenue per Month for {filter_region} Region")
@@ -160,14 +167,15 @@ st.write(
     {filter_region}. It also shows what is the forecasted
     revenue for the next {filter_months} month(s).
     """)
+df_revenue = get_revenue_data()
 st.line_chart(
-    pdf_revenue, 
+    df_revenue, 
     x="MONTH", 
     y=["ACTUAL", "TARGET", "FORECAST", "LOWER_BOUND", "UPPER_BOUND"]
 )
 st.subheader("Underlying Data")
 st.write("This is the underlying data driving the chart above.")
-st.dataframe(pdf_revenue)
+st.dataframe(df_revenue)
 
 # Allow user to adjust the target
 st.header(f"Adjust Target for {filter_region} Region")
@@ -191,14 +199,15 @@ with st.form("Update Target Revenue"):
 # Write back to table when save button is pressed
 if save_button:
     try:
-        session.write_pandas(
-            df_edited_target,
-            f'"TARGET_REVENUE_{filter_region}"',
-            database="DEMO_PROGRAMMABLE_2024_STREAMLIT_DB",
-            schema="STREAMLIT_APP",
-            overwrite=True,
-            quote_identifiers=False
-        )
+        with st.spinner("Saving target revenue..."):
+            session.write_pandas(
+                df_edited_target,
+                f'"TARGET_REVENUE_{filter_region}"',
+                database="DEMO_PROGRAMMABLE_2024_STREAMLIT_DB",
+                schema="STREAMLIT_APP",
+                overwrite=True,
+                quote_identifiers=False
+            )
         st.success('Target revenue updated!', icon="✅")
         # pause for 2 seconds to give the success message time to show
         time.sleep(2)
@@ -244,5 +253,10 @@ with st.expander("Alternative approach to session.write_pandas()"):
                 INSERT (REGION, MONTH, TARGET_REVENUE, UPDATED_TS, UPDATED_BY)
                 VALUES ('{filter_region}', src.MONTH, src.TARGET_REVENUE, SYSDATE(), CURRENT_USER())
             """
-        st.markdown(f"`{merge_statement}`")
+        st.markdown(
+            f"""
+            The merge statement looks like this:
+            ```{merge_statement}
+            """.replace(" "*12,"")
+        )
         session.sql(merge_statement).collect()
