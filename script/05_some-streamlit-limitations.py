@@ -36,7 +36,6 @@ st.header("No secondary roles")
 # Secondary roles doesn't work
 # eventhough the default = ALL
 session = get_active_session()
-
+st.write(f"Current user: {st.experimental_user['login_name']}")
 df = session.sql("SELECT * FROM DATA.REVENUE").to_pandas()
-
 st.dataframe(df)
