@@ -42,7 +42,7 @@ To demonstrate some of the limitations of Streamlit in Snowflake, such as that i
 2. Add the content of [05_some-streamlit-limitations.py](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/05_some-streamlit-limitations.py) to the bottom of the demo app
 3. Run it and see the error `URLError: <urlopen error [Errno 16] Device or resource busy>`
 4. You can run the same script in your own Python environment and it should run successfully (unless you have specifically blocked network connectivity from github.com)
-5. As of the time of writing, the SiS version is 1.22.0 and does not have the [pydeck](https://pypi.org/project/pydeck/) Python library yet, so this will also fail with the error `ModuleNotFoundError: No module named 'pydeck'`
+5. As of the time of writing, the SiS version is 1.22.0 and does not have the [sankeyflow](https://pypi.org/project/sankeyflow/) Python library yet, so this will also fail with the error `ModuleNotFoundError: No module named 'sankeyflow'`
 6. If you did the previous exercise (Masking Policy), you should see all the `REVENUE` values are masked (NULL)
 7. Go back to user with `SECURITYADMIN` role and execute line 40 to 41 in [04_create-masking-policy.sql](https://github.com/ignatiusw/demo-streamlit-2024/blob/main/script/04_create-masking-policy.sql#L40-L41) to grant the sensitive role to the streamlit creator role
 8. Re-run the streamlit app again and you should now see the `REVENUE` values unmasked, this is because whilst SiS doesn't observe secondary roles, it understands inherited privileges from roles granted to other roles
