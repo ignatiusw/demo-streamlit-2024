@@ -26,9 +26,9 @@ except Exception as e:
 st.header("Limited Python libraries")
 # test import other libraries
 try:
-    # pydeck: Large-scale interactive data visualization in Python
-    # https://pypi.org/project/pydeck/
-    import pydeck
+    # SankeyFlow is a lightweight python package that plots Sankey flow diagrams using Matplotlib
+    # https://pypi.org/project/sankeyflow/
+    import sankeyflow
 except Exception as e:
     st.error(e)
 
