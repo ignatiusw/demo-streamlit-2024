@@ -1,4 +1,5 @@
 ### NOTE THIS IS CURRENTLY RUNNING ON STREAMLIT V1.22.0 - IT MAY NOT RUN ONCE STREAMLIT IN SNOWFLAKE VERSION IS UPDATED ###
+### TO LOCK THE VERSION TO 1.22.0, UPDATE environment.yml IN THE STAGE LOCATION WHERE YOUR STREAMLIT APP IS ###
 # Import python packages
 import streamlit as st
 from snowflake.snowpark.context import get_active_session
